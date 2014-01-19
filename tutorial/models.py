@@ -1,8 +1,15 @@
+from pyramid.security import (
+    Allow,
+    Everyone,
+    )
+
+import datetime
 from sqlalchemy import (
     Column,
     Index,
     Integer,
     Text,
+    DateTime,
     )
 
 from sqlalchemy.ext.declarative import declarative_base
@@ -24,8 +31,10 @@ class Cache(Base):
     id = Column(Integer, primary_key=True)
     url = Column(Text)
     data = Column(Text)
+    datetime = Column(DateTime)
 
     def __init__(self, url, data):
         self.url = url
         self.data = data
+        self.datetime = datetime.datetime.now()
 

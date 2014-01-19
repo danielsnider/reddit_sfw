@@ -1,4 +1,5 @@
 import urllib2
+import datetime
 import json
 import re
 import ast
@@ -38,7 +39,7 @@ def query2_view(request):
         else:
             subreddits = request.matchdict['subreddits']
     if 'minsize' not in request.matchdict:
-        minsize = 1000
+        minsize = 0
     else:
         minsize = int(request.matchdict['minsize'])
     
@@ -111,19 +112,21 @@ def check_cache(url):
     try:
         data = DBSession.query(Cache).filter(Cache.url==url).first()
     except DBAPIError:
-        print "Database error: \n " + conn_err_msg
-        return None
+        print "cache miss1: not found"
+        print "Database error: \n " + conn_err_msg 
+        return None 
     if data:
-        print "cache hit!"
-        return data
+        delta = datetime.datetime.now() - data.datetime
+        if delta.seconds > 900: # 15 minutes
+            print "cache miss2: stale entry"
+            return None
+        else:
+            print "cache hit!"
+            return data
     
 def cache(url, data):
-    cache = Cache(url, str(data))
-    DBSession.add(cache)
-
-    # try:
-    #     one = DBSession.query(Cache).filter(Cache.url=='http://example.url').first()
-    #     print one
-    #     print "YAY"
-    # except DBAPIError:
-    #     return Response(conn_err_msg, content_type='text/plain', status_int=500)
+    records = DBSession.query(Cache).filter(Cache.url==url).all()
+    for record in records:
+        DBSession.delete(record)
+    record = Cache(url, str(data))
+    DBSession.add(record)
