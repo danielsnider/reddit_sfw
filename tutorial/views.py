@@ -8,6 +8,7 @@ from pyramid.view import view_config
 from pyramid.httpexceptions import (
     HTTPFound,
     HTTPNotFound,
+    HTTPMovedPermanently,
     )
 
 from sqlalchemy.exc import DBAPIError
@@ -15,6 +16,24 @@ from sqlalchemy.exc import DBAPIError
 from .models import (
     DBSession,
     Cache,
+    User,
+    Fav,
+    )
+
+import math
+from operator import itemgetter
+
+import formencode
+
+from pyramid_simpleform import Form
+from pyramid_simpleform.renderers import FormRenderer
+
+from pyramid.renderers import render
+
+from pyramid.security import (
+    authenticated_userid,
+    remember,
+    forget,
     )
 
 @view_config(route_name='home', renderer='templates/mytemplate.pt')
@@ -46,9 +65,121 @@ def query2_view(request):
     reddit_url = "http://www.reddit.com/r/" + subreddits + "/hot.json?limit=20"
 
     images = find_images(reddit_url, minsize)
+    login_form = login_form_view(request)
     
-    return {'project': 'MyProject', 'images': images, 'length': len(images), 'index': index, 'subreddits': subreddits, 'minsize': minsize}
+    return {'project': 'MyProject', 'username': authenticated_userid(request), 'images': images, 'length': len(images), 'index': index, 'subreddits': subreddits, 'minsize': minsize}
 
+
+class RegistrationSchema(formencode.Schema):
+    allow_extra_fields = True
+    username = formencode.validators.PlainText(not_empty=True)
+    password = formencode.validators.PlainText(not_empty=True)
+    email = formencode.validators.Email(resolve_domain=False)
+    name = formencode.validators.String(not_empty=True)
+    password = formencode.validators.String(not_empty=True)
+    confirm_password = formencode.validators.String(not_empty=True)
+    chained_validators = [
+        formencode.validators.FieldsMatch('password', 'confirm_password')
+    ]
+
+class LoginSchema(formencode.Schema):
+    allow_extra_fields = True
+    login = formencode.validators.PlainText(not_empty=True)
+    password = formencode.validators.PlainText(not_empty=True)
+
+
+@view_config(permission='view', route_name='register',
+             renderer='templates/user_add.pt')
+def user_add(request):
+
+    form = Form(request, schema=RegistrationSchema)
+
+    if 'form.submitted' in request.POST and form.validate():
+        session = DBSession()
+        username = form.data['username']
+        user = User(
+            username=username,
+            password=form.data['password'],
+            name=form.data['name'],
+            email=form.data['email']
+        )
+        session.add(user)
+
+        headers = remember(request, username)
+
+        redirect_url = request.route_url('home')
+
+        return HTTPFound(location=redirect_url, headers=headers)
+
+    login_form = login_form_view(request)
+
+    return {
+        'form': FormRenderer(form),
+    }
+
+
+@view_config(permission='view', route_name='user',
+             renderer='templates/user.pt')
+def user_view(request):
+    username = request.matchdict['username']
+    user = User.get_by_username(username)
+    login_form = login_form_view(request)
+    return {
+        'user': user,
+        'toolbar': toolbar_view(request),
+        'login_form': login_form,
+    }
+
+@view_config(permission='view', route_name='about',
+             renderer='templates/about.pt')
+def about_view(request):
+    return {
+        'toolbar': toolbar_view(request),
+        'login_form': login_form_view(request),
+    }
+
+
+@view_config(permission='view', route_name='login', renderer='templates/login.pt')
+def login_view(request):
+    print str(request)
+    print "str(request.referer): "+ str(request.referer)
+
+    # came_from = not yet implemented
+    # came_from = request.referer.replace(request.host, "").replace("http://", "")
+
+    post_data = request.POST
+    if 'submit' in post_data:
+        login = post_data['login']
+        password = post_data['password']
+
+        if User.check_password(login, password):
+            headers = remember(request, login)
+            return HTTPFound(location="/", headers=headers)
+
+    return {}
+
+
+
+@view_config(permission='loggedin', route_name='logout')
+def logout_view(request):
+    request.session.invalidate()
+    request.session.flash(u'Logged out successfully.')
+    headers = forget(request)
+    return HTTPFound(location=request.route_url('home'), headers=headers)
+
+
+def toolbar_view(request):
+    viewer_username = authenticated_userid(request)
+    return render(
+        'templates/toolbar.pt',
+        {'viewer_username': viewer_username},
+        request
+    )
+
+
+def login_form_view(request):
+    logged_in = authenticated_userid(request)
+    return render('templates/login.pt', {'loggedin': logged_in}, request)
 
 def find_images(reddit_url, minsize):
     images = []
@@ -128,5 +259,8 @@ def cache(url, data):
     records = DBSession.query(Cache).filter(Cache.url==url).all()
     for record in records:
         DBSession.delete(record)
+    print str(data)
+    print url
     record = Cache(url, str(data))
     DBSession.add(record)
+

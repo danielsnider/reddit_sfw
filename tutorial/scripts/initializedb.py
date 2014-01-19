@@ -13,6 +13,7 @@ from ..models import (
     DBSession,
     Cache,
     Base,
+    Fav,
     )
 
 

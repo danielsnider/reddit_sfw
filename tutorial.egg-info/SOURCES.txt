@@ -7,7 +7,6 @@ setup.cfg
 setup.py
 tutorial/__init__.py
 tutorial/models.py
-tutorial/security.py
 tutorial/tests.py
 tutorial/views.py
 tutorial.egg-info/PKG-INFO
@@ -25,4 +24,9 @@ tutorial/static/my_javascript.js
 tutorial/static/pylons.css
 tutorial/static/right.png
 tutorial/static/style.css
+tutorial/templates/about.pt
+tutorial/templates/login.pt
 tutorial/templates/mytemplate.pt
+tutorial/templates/toolbar.pt
+tutorial/templates/user.pt
+tutorial/templates/user_add.pt

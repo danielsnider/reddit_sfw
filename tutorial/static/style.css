@@ -120,3 +120,18 @@ a{
 .right {
   right: 10%;
 }
+
+.favorite {
+   text-align: left;
+  position: absolute;
+  top: 1%;
+  right: 1%;
+  background-color: gray;
+  border-radius:5px;
+  padding: 3px 6px;
+  opacity:0.75; 
+}
+
+.seperator { 
+  padding: 0px 5px;
+}

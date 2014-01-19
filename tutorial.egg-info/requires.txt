@@ -2,6 +2,11 @@ pyramid
 SQLAlchemy
 transaction
 pyramid_tm
+pyramid_exclog
 pyramid_debugtoolbar
 zope.sqlalchemy
 waitress
+pyramid_simpleform
+pyramid_chameleon
+cryptacular
+pycrypto
