@@ -65,43 +65,13 @@ class Fav(Base):
     Fav model.
     """
     __tablename__ = 'favs'
-    fav_id = Column(Integer, primary_key=True)
-    url = Column(Text, unique=True, index=True)
+    id = Column(Integer, primary_key=True)
+    url = Column(Text)
+    username = Column(Text)
 
-    def __init__(self, url):
+    def __init__(self, url, username):
         self.url = url
-
-    @staticmethod
-    def extract_favs(favs_string):
-        favs = favs_string.replace(';', ' ').replace(',', ' ')
-        favs = [fav.lower() for fav in favs.split()]
-        favs = set(favs)
-
-        return favs
-
-    @classmethod
-    def get_by_url(cls, fav_url):
-        fav = DBSession.query(cls).filter(cls.url == fav_url)
-        return fav.first()
-
-    @classmethod
-    def create_favs(cls, favs_string):
-        favs_list = cls.extract_favs(favs_string)
-        favs = []
-
-        for fav_url in favs_list:
-            fav = cls.get_by_url(fav_url)
-            if not fav:
-                fav = Fav(url=fav_url)
-                DBSession.add(fav)
-            favs.append(fav)
-
-        return favs
-
-users_favs = Table('users_favs', Base.metadata,
-    Column('user_id', Integer, ForeignKey('users.user_id')),
-    Column('fav_id', Integer, ForeignKey('favs.fav_id'))
-)
+        self.username = username
 
 class User(Base):
     """
@@ -112,7 +82,6 @@ class User(Base):
     username = Column(Unicode(20), unique=True)
     name = Column(Unicode(50))
     email = Column(Unicode(50))
-    favs = relation(Fav, secondary=users_favs, backref='users')
     _password = Column('password', Unicode(60))
 
     def _get_password(self):

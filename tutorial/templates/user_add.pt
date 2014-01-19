@@ -29,3 +29,9 @@ ${form.begin(request.route_url('register'))}
 </fieldset>
 ${form.end()}
 
+<div>
+    Already have an account? 
+    <a href="/login">Login here</a>.
+</div>
+<br/>
+<div><a href="/">Home</a></div>

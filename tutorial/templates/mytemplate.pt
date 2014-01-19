@@ -16,27 +16,24 @@
   <body>
     <div class="loop" tal:repeat="image images">
       <div class="object" id="image${repeat.image.index}" style="display:none">
-        <div class="lead fade">Reddit Picture Frame
-          <div class="subreddit fade"><a href="http://reddit.com/r/${image.subreddit}">${image.subreddit}</a></div>
+        <div class="lead fade" >
+          Reddit Picture Frame
+          <div class="subreddit fade"><a href="/r/${image.subreddit}">${image.subreddit}</a></div>
         </div>
         <div class="favorite fade" tal:condition="not username">
-          <a href="${request.route_url('register')}">Favorite this image</a>
+          <a href="${request.route_url('register')}">Register</a>
           <span class="seperator">|</span>
           <a href="${request.route_url('login')}">Login</a>
-          <span class="seperator">|</span>
-          <a href="${request.route_url('register')}">Register</a>
         </div>
         <div class="favorite fade" tal:condition="username">
-          <a href="${request.route_url('register')}">Favorite this image</a>
+          <a href="javascript:void(0)" onclick='addFav("${image.url}")'>Add to favorites</a>
           <span class="seperator">|</span>
-          <a href="${request.route_url('register')}">${username}</a>
+          <a href="/users/${username}">${username}</a>
           <span class="seperator">|</span>
           <a href="${request.route_url('logout')}">Logout</a>
         </div>
-        <!-- <div class="slideshow fade">Slideshow: OFF</div> -->
         <img class="image"src="${image.url}" alt=""/>
         <div class="title"><a href="http://reddit.com${image.permalink}">${image.title}</a></div>
-        <!-- <div class="ups fade"><a href="http://reddit.com${image.permalink}">${image.ups} Upvotes</a></div> -->
         <div class="comments fade"><a href="http://reddit.com${image.permalink}">${image.ups} Upvotes, ${image.num_comments} Comments</a></div>
       </div>
     </div>  

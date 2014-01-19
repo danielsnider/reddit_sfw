@@ -1,3 +1,4 @@
+import pprint
 import urllib2
 import datetime
 import json
@@ -121,13 +122,13 @@ def user_add(request):
 @view_config(permission='view', route_name='user',
              renderer='templates/user.pt')
 def user_view(request):
+    imgs=[]
     username = request.matchdict['username']
     user = User.get_by_username(username)
-    login_form = login_form_view(request)
+    favorites = DBSession.query(Fav).filter(Fav.username==username).all()
     return {
-        'user': user,
-        'toolbar': toolbar_view(request),
-        'login_form': login_form,
+        'username': user.username,
+        'favorites': favorites,
     }
 
 @view_config(permission='view', route_name='about',
@@ -141,10 +142,7 @@ def about_view(request):
 
 @view_config(permission='view', route_name='login', renderer='templates/login.pt')
 def login_view(request):
-    print str(request)
-    print "str(request.referer): "+ str(request.referer)
-
-    # came_from = not yet implemented
+    # not yet implemented
     # came_from = request.referer.replace(request.host, "").replace("http://", "")
 
     post_data = request.POST
@@ -167,6 +165,15 @@ def logout_view(request):
     headers = forget(request)
     return HTTPFound(location=request.route_url('home'), headers=headers)
 
+@view_config(permission='loggedin', route_name='favorite')
+def favorite_view(request):
+    url = request.body
+    username = request.session['auth.userid']
+    exists = DBSession.query(Fav).filter(Fav.url==url, Fav.username==username).first()
+    if not exists:
+        record = Fav(url, username)
+        DBSession.add(record)
+    return Response('OK')
 
 def toolbar_view(request):
     viewer_username = authenticated_userid(request)
@@ -175,7 +182,6 @@ def toolbar_view(request):
         {'viewer_username': viewer_username},
         request
     )
-
 
 def login_form_view(request):
     logged_in = authenticated_userid(request)

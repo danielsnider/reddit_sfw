@@ -69,3 +69,15 @@ function previous_img () {
 		document.getElementById("image"+index).style.display = ''
 	};
 }
+
+function addFav (url) {
+    $.ajax({
+        url: "/favorite",
+        type:'POST',
+        data: url,
+        success: function(msg)
+        {
+            // alert('Fav sent');
+        }               
+    });
+}
