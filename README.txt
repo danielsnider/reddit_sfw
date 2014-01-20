@@ -17,7 +17,6 @@ Concepts demonstrated in the code include:
 
 Requirements
 --------------------
-
 - Python 2.7 (python2.7-dev)
 
 - SQLite3 (build-essentials, libsqlite3-dev)
@@ -30,7 +29,6 @@ Requirements
 
 Installing and Running
 ----------------------
-
 	virtualenv --no-site-packages env
 	cd env
 	bin/easy_install pyramid
@@ -42,7 +40,6 @@ Installing and Running
 
 Inspiration:
 ------------
-
 - https://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki2/src
 
 - https://github.com/Pylons/shootout
