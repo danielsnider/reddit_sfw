@@ -2,37 +2,33 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" xmlns:tal="http://xml.zope.org/namespaces/tal">
   <head>
     <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-    <title>Reddit Digital Picture Frame</title>
+    <title>Reddit Picture Frame</title>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
-    <meta name="keywords" content="python web application" />
-    <meta name="description" content="pyramid web application" />
     <link rel="shortcut icon" href="${request.static_url('tutorial:static/favicon.ico')}" />
     <link rel="stylesheet" href="${request.static_url('tutorial:static/pylons.css')}" type="text/css" media="screen" charset="utf-8" />
     <link rel="stylesheet" href="${request.static_url('tutorial:static/style.css')}" type="text/css" media="screen" charset="utf-8" />
-    <link rel="stylesheet" href="http://static.pylonsproject.org/fonts/nobile/stylesheet.css" media="screen" />
-    <link rel="stylesheet" href="http://static.pylonsproject.org/fonts/neuton/stylesheet.css" media="screen" />
     <tal:block tal:define="length length"><script tal:content="string:var length='${length}';"></script></tal:block>
   </head>
   <body>
     <div class="loop" tal:repeat="image images">
-      <div class="object" id="image${repeat.image.index}" style="display:none">
-        <div class="lead fade" >
+      <div class="page" id="image${repeat.image.index}" style="display:none">
+        <div class="lead fade">
           Reddit Picture Frame
           <div class="subreddit fade"><a href="/r/${image.subreddit}">${image.subreddit}</a></div>
         </div>
-        <div class="favorite fade" tal:condition="not username">
+        <div class="menu fade" tal:condition="not username">
           <a href="${request.route_url('register')}">Register</a>
           <span class="seperator">|</span>
           <a href="${request.route_url('login')}">Login</a>
         </div>
-        <div class="favorite fade" tal:condition="username">
+        <div class="menu fade" tal:condition="username">
           <a href="javascript:void(0)" onclick='addFav("${image.url}")'>Add to favorites</a>
           <span class="seperator">|</span>
           <a href="/users/${username}">${username}</a>
           <span class="seperator">|</span>
           <a href="${request.route_url('logout')}">Logout</a>
         </div>
-        <img class="image"src="${image.url}" alt=""/>
+        <img class="image"src="${image.url}">
         <div class="title"><a href="http://reddit.com${image.permalink}">${image.title}</a></div>
         <div class="comments fade"><a href="http://reddit.com${image.permalink}">${image.ups} Upvotes, ${image.num_comments} Comments</a></div>
       </div>
