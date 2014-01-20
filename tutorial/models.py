@@ -1,47 +1,34 @@
+import datetime
 import cryptacular.bcrypt
-
+from sqlalchemy.sql import func
+from sqlalchemy.ext.declarative import declarative_base
+from zope.sqlalchemy import ZopeTransactionExtension
 from pyramid.security import (
     Allow,
     Everyone,
     Authenticated,
     )
-
-import datetime
 from sqlalchemy import (
-    Table,
-    ForeignKey,
     Column,
-    Index,
     Integer,
     Text,
     DateTime,
     )
-
-from sqlalchemy.sql import func
-from sqlalchemy.ext.declarative import declarative_base
-
-from zope.sqlalchemy import ZopeTransactionExtension
-
 from sqlalchemy.orm import (
     scoped_session,
     sessionmaker,
-    relation,
-    backref,
-    column_property,
     synonym,
-    joinedload,
     )
-
 from sqlalchemy.types import (
     Integer,
     Unicode,
-    UnicodeText,
     )
+
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
-
 crypt = cryptacular.bcrypt.BCRYPTPasswordManager()
+
 
 class Cache(Base):
     """ The SQLAlchemy declarative model class for a Cache object. """
@@ -56,13 +43,10 @@ class Cache(Base):
         self.data = data
         self.datetime = datetime.datetime.now()
 
-def hash_password(password):
-    return unicode(crypt.encode(password))
-
 
 class Fav(Base):
     """
-    Fav model.
+    Model to store user favorites
     """
     __tablename__ = 'favs'
     id = Column(Integer, primary_key=True)
@@ -73,9 +57,10 @@ class Fav(Base):
         self.url = url
         self.username = username
 
+
 class User(Base):
     """
-    Application's user model.
+    User model
     """
     __tablename__ = 'users'
     user_id = Column(Integer, primary_key=True)
@@ -110,14 +95,13 @@ class User(Base):
             return False
         return crypt.check(user.password, password)
 
-    # @classmethod
-    # def fav_counts(cls):
-    #     query = DBSession.query(Fav.url, func.count('*'))
-    #     return query.join('users').group_by(Fav.url) # NOT SO SURE HERE what join 'users' does
-
 
 class RootFactory(object):
     __acl__ = [ (Allow, Everyone, 'view'),
                 (Allow, Authenticated, 'loggedin') ]
     def __init__(self, request):
         pass
+
+
+def hash_password(password):
+    return unicode(crypt.encode(password))
