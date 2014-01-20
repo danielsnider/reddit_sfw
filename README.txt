@@ -1,4 +1,4 @@
-shootout
+Reddit_sfw
 ========
 
 Reddit_sfw (Safe For Walls) is a digital picture frame web app built with the pyramid framework. With it you can view reddit SFW pictures in full screen.
