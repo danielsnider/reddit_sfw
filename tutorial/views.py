@@ -214,7 +214,7 @@ def check_cache(url):
         if delta.seconds > 900: # 15 minutes
             return None
         else:
-            print "cache hit!"
+            print "Cache hit!  Entry age(seconds): " + str(delta.seconds)
             return data
     
 
