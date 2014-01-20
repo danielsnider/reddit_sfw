@@ -63,7 +63,7 @@ def query2_view(request):
     else:
         minsize = int(request.matchdict['minsize'])
     
-    reddit_url = "http://www.reddit.com/r/" + subreddits + "/hot.json?limit=20"
+    reddit_url = "http://www.reddit.com/r/" + subreddits + "/hot.json?limit=15"
 
     images = find_images(reddit_url, minsize)
     login_form = login_form_view(request)
