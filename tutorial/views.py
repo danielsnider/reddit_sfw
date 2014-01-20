@@ -1,9 +1,13 @@
-import pprint
 import urllib2
 import datetime
 import json
 import re
 import ast
+import formencode
+from sqlalchemy.exc import DBAPIError
+from pyramid_simpleform import Form
+from pyramid_simpleform.renderers import FormRenderer
+from pyramid.renderers import render
 from pyramid.response import Response
 from pyramid.view import view_config
 from pyramid.httpexceptions import (
@@ -11,64 +15,46 @@ from pyramid.httpexceptions import (
     HTTPNotFound,
     HTTPMovedPermanently,
     )
-
-from sqlalchemy.exc import DBAPIError
-
 from .models import (
     DBSession,
     Cache,
     User,
     Fav,
     )
-
-import math
-from operator import itemgetter
-
-import formencode
-
-from pyramid_simpleform import Form
-from pyramid_simpleform.renderers import FormRenderer
-
-from pyramid.renderers import render
-
 from pyramid.security import (
     authenticated_userid,
     remember,
     forget,
     )
 
+
 @view_config(route_name='home', renderer='templates/mytemplate.pt')
 def home_view(request):
     return query2_view(request) # reuse query_view route
+
 
 @view_config(route_name='query1', renderer='templates/mytemplate.pt')
 def query1_view(request):
     return query2_view(request) # reuse query_view route
 
+
 @view_config(route_name='query2', renderer='templates/mytemplate.pt')
 def query2_view(request):
-    index = 0
     all_subreddits = "earthporn+waterporn+skyporn+spaceporn+fireporn+destructionporn+geologyporn+winterporn+autumnporn+cityporn+villageporn+abandonedporn+infrastructureporn+machineporn+militaryporn+cemeteryporn+architectureporn+carporn+gunporn+boatporn+aerialporn+F1porn+ruralporn+animalporn+botanicalporn+humanporn+adrenalineporn+climbingporn+culinaryporn+foodporn+dessertporn+agricultureporn+designporn+albumartporn+movieposterporn+adporn+geekporn+instrumentporn+macroporn+artporn+fractalporn+exposureporn+microporn+metalporn+streetartporn+historyporn+mapporn+bookporn+newsporn+quotesporn+futureporn"
 
-    if 'subreddits' not in request.matchdict:
-        subreddits = all_subreddits
-    else:
-        print "request.matchdict['subreddits']: " + request.matchdict['subreddits']
-        if request.matchdict['subreddits'] == "all":
-            subreddits = all_subreddits
-        else:
-            subreddits = request.matchdict['subreddits']
     if 'minsize' not in request.matchdict:
         minsize = 0
     else:
         minsize = int(request.matchdict['minsize'])
-    
-    reddit_url = "http://www.reddit.com/r/" + subreddits + "/hot.json?limit=15"
+    if 'subreddits' not in request.matchdict:
+        subreddits = all_subreddits 
+    else:
+        subreddits = request.matchdict['subreddits']
 
+    reddit_url = "http://www.reddit.com/r/" + subreddits + "/hot.json?limit=15"
     images = find_images(reddit_url, minsize)
-    login_form = login_form_view(request)
-    
-    return {'project': 'MyProject', 'username': authenticated_userid(request), 'images': images, 'length': len(images), 'index': index, 'subreddits': subreddits, 'minsize': minsize}
+
+    return {'project': 'MyProject', 'username': authenticated_userid(request), 'images': images, 'length': len(images)}
 
 
 class RegistrationSchema(formencode.Schema):
@@ -83,16 +69,10 @@ class RegistrationSchema(formencode.Schema):
         formencode.validators.FieldsMatch('password', 'confirm_password')
     ]
 
-class LoginSchema(formencode.Schema):
-    allow_extra_fields = True
-    login = formencode.validators.PlainText(not_empty=True)
-    password = formencode.validators.PlainText(not_empty=True)
-
 
 @view_config(permission='view', route_name='register',
              renderer='templates/user_add.pt')
 def user_add(request):
-
     form = Form(request, schema=RegistrationSchema)
 
     if 'form.submitted' in request.POST and form.validate():
@@ -105,14 +85,9 @@ def user_add(request):
             email=form.data['email']
         )
         session.add(user)
-
         headers = remember(request, username)
-
         redirect_url = request.route_url('home')
-
         return HTTPFound(location=redirect_url, headers=headers)
-
-    login_form = login_form_view(request)
 
     return {
         'form': FormRenderer(form),
@@ -122,7 +97,6 @@ def user_add(request):
 @view_config(permission='view', route_name='user',
              renderer='templates/user.pt')
 def user_view(request):
-    imgs=[]
     username = request.matchdict['username']
     user = User.get_by_username(username)
     favorites = DBSession.query(Fav).filter(Fav.username==username).all()
@@ -131,19 +105,10 @@ def user_view(request):
         'favorites': favorites,
     }
 
-@view_config(permission='view', route_name='about',
-             renderer='templates/about.pt')
-def about_view(request):
-    return {
-        'toolbar': toolbar_view(request),
-        'login_form': login_form_view(request),
-    }
-
 
 @view_config(permission='view', route_name='login', renderer='templates/login.pt')
 def login_view(request):
-    # not yet implemented
-    # came_from = request.referer.replace(request.host, "").replace("http://", "")
+    # came_from = request.referer.replace(request.host, "").replace("http://", "") 
 
     post_data = request.POST
     if 'submit' in post_data:
@@ -157,13 +122,12 @@ def login_view(request):
     return {}
 
 
-
 @view_config(permission='loggedin', route_name='logout')
 def logout_view(request):
     request.session.invalidate()
-    request.session.flash(u'Logged out successfully.')
     headers = forget(request)
     return HTTPFound(location=request.route_url('home'), headers=headers)
+
 
 @view_config(permission='loggedin', route_name='favorite')
 def favorite_view(request):
@@ -171,28 +135,17 @@ def favorite_view(request):
     username = request.session['auth.userid']
     exists = DBSession.query(Fav).filter(Fav.url==url, Fav.username==username).first()
     if not exists:
-        record = Fav(url, username)
-        DBSession.add(record)
+        favorite = Fav(url, username)
+        DBSession.add(favorite)
     return Response('OK')
 
-def toolbar_view(request):
-    viewer_username = authenticated_userid(request)
-    return render(
-        'templates/toolbar.pt',
-        {'viewer_username': viewer_username},
-        request
-    )
-
-def login_form_view(request):
-    logged_in = authenticated_userid(request)
-    return render('templates/login.pt', {'loggedin': logged_in}, request)
 
 def find_images(reddit_url, minsize):
     images = []
-    objects = check_cache(reddit_url)
 
+    objects = check_cache(reddit_url)
     if objects:
-        objects = ast.literal_eval(objects.data) #retrieve objects as dict 
+        objects = ast.literal_eval(objects.data) #convert objects to list of dicts
     else:
         json_str = get_url(reddit_url)
         if json_str == None: 
@@ -203,6 +156,7 @@ def find_images(reddit_url, minsize):
         objects = json.loads(json_str) 
         cache(reddit_url, objects)
 
+    # find images in reddit's JSON
     for obj in objects['data']['children']: 
         if 'data' in obj: 
             obj = obj['data']
@@ -222,7 +176,7 @@ def get_url(url):
         response = urllib2.urlopen(url)
         html = response.read()
     except Exception as e:
-        print e
+        print e 
         return None
     return html
 
@@ -243,19 +197,17 @@ def extract_image_size(string):
         size[1] = int(size[1])
         return size
     else:
-        return False
+        return None
 
 def check_cache(url):
     try:
         data = DBSession.query(Cache).filter(Cache.url==url).first()
     except DBAPIError:
-        print "cache miss1: not found"
         print "Database error: \n " + conn_err_msg 
         return None 
     if data:
         delta = datetime.datetime.now() - data.datetime
         if delta.seconds > 900: # 15 minutes
-            print "cache miss2: stale entry"
             return None
         else:
             print "cache hit!"
@@ -264,9 +216,7 @@ def check_cache(url):
 def cache(url, data):
     records = DBSession.query(Cache).filter(Cache.url==url).all()
     for record in records:
-        DBSession.delete(record)
-    print str(data)
-    print url
+        DBSession.delete(record) #remove any duplicates just in case
     record = Cache(url, str(data))
     DBSession.add(record)
 
