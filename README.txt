@@ -19,7 +19,7 @@ Requirements
 --------------------
 - Python 2.7 (python2.7-dev)
 
-- SQLite3 (build-essentials, libsqlite3-dev)
+- SQLite3 (build-essential, libsqlite3-dev)
 
 - Setuptools (ez_setup.py)
 
@@ -29,6 +29,13 @@ Requirements
 
 Installing and Running
 ----------------------
+	sudo apt-get install python2.7-dev build-essential libsqlite3-dev curl
+	wget -c http://peak.telecommunity.com/dist/ez_setup.py
+	python ez_setup.py
+	easy_install pip
+	pip install virtualenv
+	mkdir reddit_sfw
+	cd reddit_sfw
 	virtualenv --no-site-packages env
 	cd env
 	bin/easy_install pyramid

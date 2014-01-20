@@ -162,13 +162,14 @@ def find_images(reddit_url, minsize):
             obj = obj['data']
             if 'url' in obj:
                 if contains_image_file_extension(obj['url']):
-                    size = extract_image_size(obj['title'])
-                    if size:
-                        if size[0] > minsize and size[1] > minsize:
-                            image = obj
-                            image['width'] = size[0]
-                            image['height'] = size[1]
-                            images.append(image) 
+                    # size = extract_image_size(obj['title'])
+                    # if size:
+                    #     if size[0] > minsize and size[1] > minsize:
+                    #         image = obj
+                    #         image['width'] = size[0]
+                    #         image['height'] = size[1]
+                    #         images.append(image) 
+                    images.append(obj) 
     return images
 
 

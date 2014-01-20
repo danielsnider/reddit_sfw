@@ -47,7 +47,7 @@ $(function () {
 
 
 function next_img () {
-	$('.fade').fadeIn();
+	// $('.fade').fadeIn();
 	if (index < length-1) {
 		document.getElementById("image"+index).style.display = 'None'
 		index++;
@@ -56,7 +56,7 @@ function next_img () {
 }
 
 function previous_img () {
-	$('.fade').fadeIn();
+	// $('.fade').fadeIn();
 	if (index > 0) {
 		document.getElementById("image"+index).style.display = 'None'
 		index--;
