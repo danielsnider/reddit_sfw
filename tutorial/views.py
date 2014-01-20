@@ -171,6 +171,7 @@ def find_images(reddit_url, minsize):
                             images.append(image) 
     return images
 
+
 def get_url(url):
     try:
         response = urllib2.urlopen(url)
@@ -180,12 +181,14 @@ def get_url(url):
         return None
     return html
 
+
 def contains_image_file_extension(string):
     img_formats = [".jpg", ".jpeg", ".gif", ".png", ".svg", ".tiff", ".bmp", ".JPG", ".JPEG", ".GIF", ".PNG", ".SVG", ".TIFF", ".BMP" ]
     if any(img_format in string for img_format in img_formats):
         return True
     else:
         return False
+
 
 def extract_image_size(string):
     size = re.search(r'\d+\s*[x]\s*\d+', string)
@@ -198,6 +201,7 @@ def extract_image_size(string):
         return size
     else:
         return None
+
 
 def check_cache(url):
     try:
@@ -213,6 +217,7 @@ def check_cache(url):
             print "cache hit!"
             return data
     
+
 def cache(url, data):
     records = DBSession.query(Cache).filter(Cache.url==url).all()
     for record in records:
