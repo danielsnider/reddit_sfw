@@ -37,7 +37,6 @@
         <div class="comments fade"><a href="http://reddit.com${image.permalink}">${image.ups} Upvotes, ${image.num_comments} Comments</a></div>
       </div>
     </div>  
-
     <script src="${request.static_url('tutorial:static/my_javascript.js')}"></script>
   </body>
 </html>
