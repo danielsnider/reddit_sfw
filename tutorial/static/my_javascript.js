@@ -1,22 +1,16 @@
 window.onload = function () {
-	// alert(width0);
-	// var elem = document.getElementById("image");
-	// elem.style.width = window.screen.width-20 + "px";
-
-	// var w_ratio = window.screen.width / width;
-	// var w_ratio = window.screen.height / height;
 	index = 0;
 	document.getElementById("image"+index).style.display = '';	
 }
 
 $('body').keydown(function (e) {
-	if(e.keyCode == 39){ //right arrow key
+	if(e.keyCode == 39){ // right arrow key
 		next_img();
 	}
 });
 
 $('body').keydown(function (e) {
-	if(e.keyCode == 37){ //left arrow key
+	if(e.keyCode == 37){ // left arrow key
 		previous_img();	
 	}
 });
