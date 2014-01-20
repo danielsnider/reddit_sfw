@@ -43,3 +43,8 @@ Inspiration:
 - https://github.com/Pylons/pyramid/tree/1.3-branch/docs/tutorials/wiki2/src
 
 - https://github.com/Pylons/shootout
+
+
+Known Issues:
+--------------
+

@@ -30,6 +30,8 @@
         </div>
         <img class="image"src="${image.url}">
         <div class="title"><a href="http://reddit.com${image.permalink}">${image.title}</a></div>
+        <img class="arrow left fade" src="${request.static_url('tutorial:static/left.png')}" onclick="previous_img()"/>
+          <img class="arrow right fade" src="${request.static_url('tutorial:static/right.png')}" onclick="next_img()"/>
         <div class="comments fade"><a href="http://reddit.com${image.permalink}">${image.ups} Upvotes, ${image.num_comments} Comments</a></div>
       </div>
     </div>  
