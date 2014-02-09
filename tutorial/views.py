@@ -51,10 +51,10 @@ def query2_view(request):
     else:
         subreddits = request.matchdict['subreddits']
 
-    reddit_url = "http://www.reddit.com/r/" + subreddits + "/hot.json?limit=15"
+    reddit_url = "http://www.reddit.com/r/" + subreddits + "/hot.json?limit=5000"
     images = find_images(reddit_url, minsize)
 
-    return {'images_str': dict_to_str(images), 'username': authenticated_userid(request), 'images': images, 'length': len(images)}
+    return {'images_str': dict_to_str(images), 'username': authenticated_userid(request)}
 
 
 class RegistrationSchema(formencode.Schema):
@@ -231,7 +231,8 @@ def dict_to_str(mylist):
     for obj in mylist:
         new_obj = obj
         for key, value in obj.iteritems():
-            if '"' in str(value): 
-                new_obj[key] = value.replace('"',r'\"')
+            if isinstance(value, unicode):
+                if '"' in value: 
+                    new_obj[key] = value.replace('"',r'\"')
         new_objs.append(new_obj)
     return json.dumps(new_objs).replace("'",r"\'")

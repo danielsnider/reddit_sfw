@@ -96,3 +96,7 @@ a{
 .right {
   right: 20px;
 }
+
+.buffer {
+  display: none;
+}
