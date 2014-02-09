@@ -32,16 +32,18 @@ Installing and Running
 	sudo apt-get install python2.7-dev build-essential libsqlite3-dev curl
 	wget -c http://peak.telecommunity.com/dist/ez_setup.py
 	python ez_setup.py
-	easy_install pip
-	pip install virtualenv
+	sudo easy_install pip
+	sudo pip install virtualenv
 	mkdir reddit_sfw
 	cd reddit_sfw
-	virtualenv --no-site-packages env
+	sudo virtualenv --no-site-packages env
 	cd env
-	bin/easy_install pyramid
+	sudo bin/easy_install pyramid
+	bin/pcreate -s alchemy reddit_sfw
+	rm reddit_sfw
 	git clone git@github.com:danielsnider/reddit_sfw.git
 	cd reddit_sfw
-	python setup.py develop
+	../bin/python setup.py develop
 	../bin/initialize_tutorial_db development.ini
 	../bin/pserve development.ini --reload
 
