@@ -1,6 +1,7 @@
 window.onload = function () {
 	index = 0;
 	document.getElementById("image"+index).style.display = '';	
+	var images = JSON.parse(images_json);
 }
 
 $('body').keydown(function (e) {
