@@ -54,7 +54,7 @@ def query2_view(request):
     reddit_url = "http://www.reddit.com/r/" + subreddits + "/hot.json?limit=15"
     images = find_images(reddit_url, minsize)
 
-    return {'images_json': generate_json(images), 'username': authenticated_userid(request), 'images': images, 'length': len(images)}
+    return {'images_str': dict_to_str(images), 'username': authenticated_userid(request), 'images': images, 'length': len(images)}
 
 
 class RegistrationSchema(formencode.Schema):
@@ -226,12 +226,12 @@ def cache(url, data):
     record = Cache(url, str(data))
     DBSession.add(record)
 
-def generate_json(mylist):
+def dict_to_str(mylist):
     new_objs = []
     for obj in mylist:
         new_obj = obj
         for key, value in obj.iteritems():
             if '"' in str(value): 
-                new_obj[key] = value.replace('"','&&&&')
+                new_obj[key] = value.replace('"',r'\"')
         new_objs.append(new_obj)
     return json.dumps(new_objs).replace("'",r"\'")
