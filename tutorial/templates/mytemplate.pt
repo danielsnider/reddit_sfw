@@ -11,11 +11,10 @@
     <tal:block tal:define="images_str images_str"><script tal:content="string:var images_str='${images_str}';"></script></tal:block>
   </head>
   <body>
-    <div class="loop" tal:repeat="image images">
-      <div class="page" id="image${repeat.image.index}" style="display:none">
+      <div class="page">
         <div class="lead fade">
           Reddit Picture Frame
-          <div class="subreddit fade"><a href="/r/${image.subreddit}">${image.subreddit}</a></div>
+          <div class="subreddit fade"><a id="subreddit" href=""></a></div>
         </div>
         <div class="menu fade" tal:condition="not username">
           <a href="${request.route_url('register')}">Register</a>
@@ -23,19 +22,18 @@
           <a href="${request.route_url('login')}">Login</a>
         </div>
         <div class="menu fade" tal:condition="username">
-          <a href="javascript:void(0)" onclick='addFav("${image.url}")'>Add to favorites</a>
+          <a href="javascript:void(0)" onclick='addFav("")'>Add to favorites</a>
           <span class="seperator">|</span>
           <a href="/users/${username}">${username}</a>
           <span class="seperator">|</span>
           <a href="${request.route_url('logout')}">Logout</a>
         </div>
-        <img class="image"src="${image.url}">
-        <div class="title"><a href="http://reddit.com${image.permalink}">${image.title}</a></div>
+        <img class="image" id="image" src="">
+        <div class="title"><a id="title" href=""></a></div>
         <img class="arrow left fade" src="${request.static_url('tutorial:static/left.png')}" onclick="previous_img()"/>
           <img class="arrow right fade" src="${request.static_url('tutorial:static/right.png')}" onclick="next_img()"/>
-        <div class="comments fade"><a href="http://reddit.com${image.permalink}">${image.ups} Upvotes, ${image.num_comments} Comments</a></div>
+        <div class="comments fade"><a id="comments" href=""></a></div>
       </div>
-    </div>  
     <script src="${request.static_url('tutorial:static/my_javascript.js')}"></script>
   </body>
 </html>

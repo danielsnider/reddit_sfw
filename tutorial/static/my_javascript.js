@@ -1,8 +1,16 @@
 window.onload = function () {
 	index = 0;
-	document.getElementById("image"+index).style.display = '';	
-	console.log(images_str);
+	// document.getElementById("image"+index).style.display = '';	
 	var images = JSON.parse(images_str);
+	console.log(images[0]);
+	console.log(images[0].url);
+	document.getElementById("image").src = images[0].url;
+	document.getElementById("title").href = "https://www.google.com/search?q=" + images[0].title;
+	document.getElementById("title").innerHTML = images[0].title;
+	document.getElementById("comments").href = "http://reddit.com" + images[0].permalink;
+	document.getElementById("comments").innerHTML = images[0].ups + " Upvotes, " + images[0].num_comments + " Comments";
+	document.getElementById("subreddit").href = "/r/" + images[0].subreddit;
+	document.getElementById("subreddit").innerHTML = images[0].subreddit;
 }
 
 $('body').keydown(function (e) {
@@ -50,20 +58,20 @@ $(function () {
 
 function next_img () {
 	// $('.fade').fadeIn();
-	if (index < length-1) {
-		document.getElementById("image"+index).style.display = 'None'
-		index++;
-		document.getElementById("image"+index).style.display = ''
-	};
+	// if (index < length-1) {
+	// 	document.getElementById("image"+index).style.display = 'None'
+	// 	index++;
+	// 	document.getElementById("image"+index).style.display = ''
+	// };
 }
 
 function previous_img () {
 	// $('.fade').fadeIn();
-	if (index > 0) {
-		document.getElementById("image"+index).style.display = 'None'
-		index--;
-		document.getElementById("image"+index).style.display = ''
-	};
+	// if (index > 0) {
+	// 	document.getElementById("image"+index).style.display = 'None'
+	// 	index--;
+	// 	document.getElementById("image"+index).style.display = ''
+	// };
 }
 
 function addFav (url) {
