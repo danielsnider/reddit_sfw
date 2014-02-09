@@ -40,7 +40,7 @@ Installing and Running
 	cd env
 	bin/easy_install pyramid
 	git clone git@github.com:danielsnider/reddit_sfw.git
-	cd tutorial
+	cd reddit_sfw
 	python setup.py develop
 	../bin/initialize_tutorial_db development.ini
 	../bin/pserve development.ini --reload
